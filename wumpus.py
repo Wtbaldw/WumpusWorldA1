@@ -102,7 +102,7 @@ class WumpusWorld:
             "breeze" : False,
             "stench" : False,
             "safe" : True,
-            "glitter" : True,
+            "glitter" : False,
         }
         for neighbor in self.neighbors(x,y):
             nx,ny = neighbor
