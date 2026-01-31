@@ -85,7 +85,7 @@ class WumpusWorld:
         if self.inBounds(r,c-1): #up
             yield (r,c-1)
     
-    def inBounds(self,r,c):
+    def inBounds(self,r,c): #checks if square is inBounds
         r = r
         c = c
         if (0<=r< self.rows) and (0<=c< self.cols):
@@ -106,7 +106,7 @@ class WumpusWorld:
             "stench" : False,
             "glitter" : False,
         }
-        for nx, ny in self.neighbors(x,y):
+        for nx, ny in self.neighbors(x,y): #checks through neighboring squares and changes percepts if needed
             if self.grid[nx][ny] == WUMPUS:
                 percepts["stench"] = True
             if self.grid[nx][ny] == PIT:
@@ -213,8 +213,7 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-        if world.agent_alive:
-            # percepts = world.get_Percepts()
+        if world.agent_alive: 
             agent.act(world)
         else:
             print("Agent died")
