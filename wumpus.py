@@ -96,7 +96,25 @@ class WumpusWorld:
             False
 
 
-    def percepts(self):
+    def get_percepts(self):
+        x,y = self.agent_pos
+        percepts = {
+            "breeze" : False,
+            "stench" : False,
+            "safe" : True,
+            "glitter" : True,
+        }
+        for neighbor in self.neighbors(x,y):
+            nx,ny = neighbor
+            if self.grid[nx][ny] == WUMPUS:
+                percepts["stench"] = True
+            if self.grid[nx][ny] == PIT:
+                percepts["breeze"] = True
+            if self.grid[x][y] == GOLD:
+                percepts["glitter"] == True
+            if percepts["stench"] or percepts["breeze"]:
+                percepts["safe"] == False
+        return percepts
         """
         Return the agent's current percepts.
         Example:
