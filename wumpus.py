@@ -37,24 +37,14 @@ class WumpusWorld:
         self.grid = [["EMPTY" for each in range(cols)] for _ in range(rows)] #Adding # of columns for each row, creating a 2D grid
         self.agent_alive = True
         self.agent_pos = (0,0)
+
         pass
 
-        for i in range(2):
-            self.place_random(PIT)
-        self.place_random(WUMPUS)
-        self.place_random(GOLD)
 
     def place_random(self, item): #placing gold and obstacles into the grid
-        while True:
-            x = random.randint(0, self.rows - 1)
-            y = random.randint(0, self.cols - 1)
-            if self.grid[x][y] == "EMPTY" and self.grid[x][y] != (0,0):
-                self.grid[x][y] = item
-                break
+        x,y = self.random_empty_cell()
+        self.grid[x][y] = item
 
-
-
-        
 
     def place_world(self):
         """
@@ -64,13 +54,23 @@ class WumpusWorld:
         - Multiple pits
         Ensure the starting cell is safe.
         """
+        for i in range(2):
+            self.place_random(PIT)
+        self.place_random(WUMPUS)
+        self.place_random(GOLD)
+        print(self.grid)
         pass
 
     def random_empty_cell(self):
         """
         Return a random (row, col) that is empty and not the start cell.
         """
-        pass
+        while True:
+            x = random.randint(0, self.rows - 1)
+            y = random.randint(0, self.cols - 1)
+            if self.grid[x][y] == "EMPTY" and self.grid[x][y] != (0,0):
+                return (x,y)
+
 
     def neighbors(self, r, c):
         """
