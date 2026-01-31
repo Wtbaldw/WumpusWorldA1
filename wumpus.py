@@ -76,7 +76,27 @@ class WumpusWorld:
         """
         Yield valid neighboring cells (up, down, left, right).
         """
-        pass
+        r = r
+        c = c
+        neighbors = []
+        if self.inBounds(r+1,c):
+            neighbors.append((r+1,c))
+        if self.inBounds(r-1,c):
+            neighbors.append((r-1,c))
+        if self.inBounds(r,c+1):
+            neighbors.append((r,c+1))
+        if self.inBounds(r,c-1):
+            neighbors.append((r,c-1))
+        return neighbors
+    
+    def inBounds(self,r,c):
+        r = r
+        c = c
+        if (0<r< self.rows) and (0<c< self.cols):
+            return True
+        else:
+            False
+
 
     def percepts(self):
         """
