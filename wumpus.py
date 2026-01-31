@@ -66,7 +66,7 @@ class WumpusWorld:
         while True:
             x = random.randint(0, self.rows - 1)
             y = random.randint(0, self.cols - 1)
-            if self.grid[x][y] == "EMPTY" and self.grid[x][y] != (0,0):
+            if self.grid[x][y] == "EMPTY" and (x,y) != (0,0):
                 return (x,y)
 
 
