@@ -35,11 +35,10 @@ class WumpusWorld:
         self.rows = rows
         self.cols = cols
         self.grid = [["EMPTY" for each in range(cols)] for _ in range(rows)] #Adding # of columns for each row, creating a 2D grid
+        self.place_world()
         self.agent_alive = True
         self.agent_pos = (0,0)
-
         pass
-
 
     def place_random(self, item): #placing gold and obstacles into the grid
         x,y = self.random_empty_cell()
@@ -54,11 +53,10 @@ class WumpusWorld:
         - Multiple pits
         Ensure the starting cell is safe.
         """
-        for i in range(2):
+        for i in range(3):
             self.place_random(PIT)
         self.place_random(WUMPUS)
         self.place_random(GOLD)
-        print(self.grid)
         pass
 
     def random_empty_cell(self):
@@ -158,7 +156,7 @@ def draw_world(screen, world):
                 pygame.draw.circle(screen, BLACK, rect.center, 20)
             if cell == GOLD:
                 pygame.draw.circle(screen, YELLOW, rect.center, 15)
-            if cell == WUMPUS and world.wumpus_alive:
+            if cell == WUMPUS: # and world.wumpus_alive: Just remove wumpus from board when killed?
                 pygame.draw.circle(screen, RED, rect.center, 20)
 
     # Agent
@@ -171,12 +169,12 @@ def draw_world(screen, world):
     )
     pygame.draw.rect(screen, BLUE, agent_rect)
 
-    # Percepts (visual hints only)
-    stench, breeze, glitter = world.percepts()
+    """# Percepts (visual hints only)
+     stench, breeze, glitter = world.percepts() 
     if breeze:
         pygame.draw.circle(screen, GRAY, agent_rect.center, 8)
     if stench:
-        pygame.draw.circle(screen, GREEN, agent_rect.center, 5)
+        pygame.draw.circle(screen, GREEN, agent_rect.center, 5) """
 
 
 # ---------------- MAIN ----------------
