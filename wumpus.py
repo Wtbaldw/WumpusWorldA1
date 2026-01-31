@@ -202,6 +202,7 @@ def main():
                 sys.exit()
 
         if world.agent_alive:
+            # percepts = world.get_Percepts()
             agent.act(world)
         else:
             print("Agent died")
