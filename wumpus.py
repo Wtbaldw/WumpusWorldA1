@@ -76,51 +76,45 @@ class WumpusWorld:
         """
         r = r
         c = c
-        neighbors = []
-        if self.inBounds(r+1,c):
-            neighbors.append((r+1,c))
-        if self.inBounds(r-1,c):
-            neighbors.append((r-1,c))
-        if self.inBounds(r,c+1):
-            neighbors.append((r,c+1))
-        if self.inBounds(r,c-1):
-            neighbors.append((r,c-1))
-        return neighbors
+        if self.inBounds(r+1,c): #right
+            yield (r+1,c)
+        if self.inBounds(r-1,c): #left 
+            yield (r-1,c)
+        if self.inBounds(r,c+1): #down
+            yield (r,c+1)
+        if self.inBounds(r,c-1): #up
+            yield (r,c-1)
     
     def inBounds(self,r,c):
         r = r
         c = c
-        if (0<r< self.rows) and (0<c< self.cols):
+        if (0<=r< self.rows) and (0<=c< self.cols):
             return True
         else:
             False
 
 
     def get_percepts(self):
+        """
+        Return the agent's current percepts.
+        Example:
+        (stench, breeze, glitter)
+        """
         x,y = self.agent_pos
         percepts = {
             "breeze" : False,
             "stench" : False,
-            "safe" : True,
             "glitter" : False,
         }
-        for neighbor in self.neighbors(x,y):
-            nx,ny = neighbor
+        for nx, ny in self.neighbors(x,y):
             if self.grid[nx][ny] == WUMPUS:
                 percepts["stench"] = True
             if self.grid[nx][ny] == PIT:
                 percepts["breeze"] = True
             if self.grid[x][y] == GOLD:
                 percepts["glitter"] == True
-            if percepts["stench"] or percepts["breeze"]:
-                percepts["safe"] == False
-        return percepts
-        """
-        Return the agent's current percepts.
-        Example:
-        (stench, breeze, glitter)
-        """
-        pass
+        return  percepts["stench"], percepts["breeze"], percepts["glitter"]
+
 
     def move(self, pos):
         """
@@ -187,12 +181,12 @@ def draw_world(screen, world):
     )
     pygame.draw.rect(screen, BLUE, agent_rect)
 
-    """# Percepts (visual hints only)
-     stench, breeze, glitter = world.percepts() 
+    # Percepts (visual hints only)
+    stench, breeze, glitter = world.get_percepts() 
     if breeze:
         pygame.draw.circle(screen, GRAY, agent_rect.center, 8)
     if stench:
-        pygame.draw.circle(screen, GREEN, agent_rect.center, 5) """
+        pygame.draw.circle(screen, GREEN, agent_rect.center, 5) 
 
 
 # ---------------- MAIN ----------------
