@@ -2,7 +2,7 @@ import pygame
 import random
 import sys
 import time
-
+#
 # ---------------- CONFIG ----------------
 CELL_SIZE = 80
 FPS = 5
