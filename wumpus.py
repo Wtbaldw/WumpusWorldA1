@@ -135,17 +135,27 @@ class WumpusWorld:
 
         # r,c= self.agent_pos
         # self.agent_pos=(r,c)
-        print(self.getSafeNeighbors())
-        r,c = random.choice(self.getSafeNeighbors())
-        self.pos = (r,c)
-
-        if self.grid[r][c]==PIT:
-            print("💀 Agent fell into a pit!")
-            self.agent_alive=False
-        if self.grid[r][c]==WUMPUS and self.wumpus_alive:
-            print("💀 Agent eaten by the Wumpus!")
-            self.agent_alive = False
-        
+        if action == "pickup_gold":
+            self.pickup_gold()
+        elif action == "avoid_and_shoot":
+            #avoid
+            self.shoot()
+            pass
+        elif action == "avoid":
+            #avoid
+            pass
+        elif action == "move_randomly": #avoids danger squares, just change to .neighbors instead of safe to not do this
+            print(self.getSafeNeighbors())
+            r,c = random.choice(self.getSafeNeighbors())
+            self.agent_pos = (r,c)
+            if self.grid[r][c]==PIT:
+                print("💀 Agent fell into a pit!")
+                self.agent_alive=False
+            if self.grid[r][c]==WUMPUS and self.wumpus_alive:
+                print("💀 Agent eaten by the Wumpus!")
+                self.agent_alive = False
+            
+            
         pass
 
     def shoot(self, target):
@@ -189,8 +199,10 @@ class SimpleReflexAgent:
         percepts = world.get_percepts() 
         print(percepts)
         action = self.get_action(percepts)
+        print(action)
         world.move(action)
         pass
+
     def get_action(self, percepts):
         if percepts[2]: #glitter
             return "pickup_gold"
