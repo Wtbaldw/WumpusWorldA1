@@ -87,6 +87,11 @@ class WumpusWorld:
             yield (r,c+1)
         if self.inBounds(r,c-1): #up
             yield (r,c-1)
+    def getSafeNeighbors(self):
+        neighbors = self.neighbors()
+        for x, y in neighbors:
+            if self.grid[x][y] not in [WUMPUS,PIT]:
+                yield x, y
     
     def inBounds(self,r,c): #checks if square is inBounds
         r = r
@@ -119,14 +124,18 @@ class WumpusWorld:
         return  percepts["stench"], percepts["breeze"], percepts["glitter"]
 
 
-    def move(self, action):
+    def move(self):
         """
         Move the agent to a new position.
         Update agent_alive if it falls into a pit or meets the Wumpus.
         """
         #also needs to avoid dying
-        r,c= self.agent_pos
-        self.agent_pos=(r,c)
+
+        # r,c= self.agent_pos
+        # self.agent_pos=(r,c)
+        r, c = random.choice(self.getSafeNeighbors())
+        self.agent_pos = (r, c)
+
         if self.grid[r][c]==PIT:
             print("💀 Agent fell into a pit!")
             self.agent_alive=False
