@@ -73,12 +73,11 @@ class WumpusWorld:
                 return (x,y)
 
 
-    def neighbors(self, r, c):
+    def neighbors(self):
         """
         Yield valid neighboring cells (up, down, left, right).
         """
-        r = r
-        c = c
+        r,c = self.agent_pos
         if self.inBounds(r+1,c): #right
             yield (r+1,c)
         if self.inBounds(r-1,c): #left 
@@ -87,11 +86,14 @@ class WumpusWorld:
             yield (r,c+1)
         if self.inBounds(r,c-1): #up
             yield (r,c-1)
+
     def getSafeNeighbors(self):
         neighbors = self.neighbors()
+        safeNeighbors = []
         for x, y in neighbors:
             if self.grid[x][y] not in [WUMPUS,PIT]:
-                yield x, y
+                safeNeighbors.append((x, y))
+        return safeNeighbors
     
     def inBounds(self,r,c): #checks if square is inBounds
         r = r
@@ -114,7 +116,7 @@ class WumpusWorld:
             "stench" : False,
             "glitter" : False,
         }
-        for nx, ny in self.neighbors(x,y): #checks through neighboring squares and changes percepts if needed
+        for nx, ny in self.neighbors(): #checks through neighboring squares and changes percepts if needed
             if self.grid[nx][ny] == WUMPUS and self.wumpus_alive:
                 percepts["stench"] = True
             if self.grid[nx][ny] == PIT:
@@ -124,7 +126,7 @@ class WumpusWorld:
         return  percepts["stench"], percepts["breeze"], percepts["glitter"]
 
 
-    def move(self):
+    def move(self, action):
         """
         Move the agent to a new position.
         Update agent_alive if it falls into a pit or meets the Wumpus.
@@ -133,8 +135,9 @@ class WumpusWorld:
 
         # r,c= self.agent_pos
         # self.agent_pos=(r,c)
-        r, c = random.choice(self.getSafeNeighbors())
-        self.agent_pos = (r, c)
+        print(self.getSafeNeighbors())
+        r,c = random.choice(self.getSafeNeighbors())
+        self.pos = (r,c)
 
         if self.grid[r][c]==PIT:
             print("💀 Agent fell into a pit!")
