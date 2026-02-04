@@ -14,7 +14,7 @@ GOLD = 3
 
 # Colors
 WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+BLACK = (0, 0, 0) 
 GRAY = (200, 200, 200)
 RED = (220, 50, 50)
 BLUE = (80, 80, 220)
@@ -116,7 +116,7 @@ class WumpusWorld:
         return  percepts["stench"], percepts["breeze"], percepts["glitter"]
 
 
-    def move(self, pos):
+    def move(self, action):
         """
         Move the agent to a new position.
         Update agent_alive if it falls into a pit or meets the Wumpus.
@@ -149,7 +149,19 @@ class SimpleReflexAgent:
         - No planning
         - No inference
         """
+        percepts = world.get_percepts() 
+        action = self.get_action(percepts)
+        world.move(action)
         pass
+    def get_action(percepts):
+        if percepts["glitter"]:
+            return "pickup_gold"
+        if percepts["stench"]:
+            return "avoid_and_shoot"
+        if percepts["breeze"]:
+            return "avoid"
+        return "move_randomly"
+
 
 
 # ---------------- DRAWING ----------------
@@ -213,7 +225,7 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-        if world.agent_alive: 
+        if world.agent_alive:
             agent.act(world)
         else:
             print("Agent died")
