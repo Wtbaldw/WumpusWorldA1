@@ -37,7 +37,10 @@ class WumpusWorld:
         self.grid = [["EMPTY" for each in range(cols)] for _ in range(rows)] #Adding # of columns for each row, creating a 2D grid
         self.place_world()
         self.agent_alive = True
-        self.agent_pos = (0,0)
+        self.agent_pos = (rows-1,0)
+        self.arrow=True
+        self.has_gold=False
+        self.wumpus_alive=True
         pass
 
     def place_random(self, item): #placing gold and obstacles into the grid
@@ -107,7 +110,7 @@ class WumpusWorld:
             "glitter" : False,
         }
         for nx, ny in self.neighbors(x,y): #checks through neighboring squares and changes percepts if needed
-            if self.grid[nx][ny] == WUMPUS:
+            if self.grid[nx][ny] == WUMPUS and self.wumpus_alive:
                 percepts["stench"] = True
             if self.grid[nx][ny] == PIT:
                 percepts["breeze"] = True
@@ -121,6 +124,15 @@ class WumpusWorld:
         Move the agent to a new position.
         Update agent_alive if it falls into a pit or meets the Wumpus.
         """
+        r,c=pos
+        self.agent_pos=(r,c)
+        if self.grid[r][c]==PIT:
+            print("💀 Agent fell into a pit!")
+            self.agent_alive=False
+        if self.grid[r][c]==WUMPUS and self.wumpus_alive:
+            print("💀 Agent eaten by the Wumpus!")
+            self.agent_alive = False
+        
         pass
 
     def shoot(self, target):
@@ -129,13 +141,25 @@ class WumpusWorld:
         The agent only has one arrow.
         Print '☠️ Wumpus screamed!' if the Wumpus is killed.
         """
-        pass
+        if not self.arrow:
+            return 
+        self.arrow=False
+        if target==self.wumpus_pos and self.wumpus_alive:
+            self.wupus_alive=False
+            print("☠️ Wumpus screamed!")
+        
+        
 
     def pickup_gold(self):
         """
         Pick up gold if the agent is in the same cell.
         """
-        pass
+        r,c=self.agent_pos
+        if self.grid[r][c]==GOLD:
+            self.has_gold=True
+            self.grid[r][c]=EMPTY
+            print("✨ Gold picked up!")
+        
 
 
 # ---------------- AGENT ----------------
