@@ -124,7 +124,8 @@ class WumpusWorld:
         Move the agent to a new position.
         Update agent_alive if it falls into a pit or meets the Wumpus.
         """
-        r,c=pos
+        #also needs to avoid dying
+        r,c= self.agent_pos
         self.agent_pos=(r,c)
         if self.grid[r][c]==PIT:
             print("💀 Agent fell into a pit!")
@@ -174,15 +175,16 @@ class SimpleReflexAgent:
         - No inference
         """
         percepts = world.get_percepts() 
+        print(percepts)
         action = self.get_action(percepts)
         world.move(action)
         pass
-    def get_action(percepts):
-        if percepts["glitter"]:
+    def get_action(self, percepts):
+        if percepts[2]: #glitter
             return "pickup_gold"
-        if percepts["stench"]:
+        if percepts[0]: #stench
             return "avoid_and_shoot"
-        if percepts["breeze"]:
+        if percepts[1]: #breeze
             return "avoid"
         return "move_randomly"
 
