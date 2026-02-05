@@ -34,13 +34,14 @@ class WumpusWorld:
         """ 
         self.rows = rows
         self.cols = cols
-        self.grid = [["EMPTY" for each in range(cols)] for _ in range(rows)] #Adding # of columns for each row, creating a 2D grid
+        self.grid = [[EMPTY for each in range(cols)] for _ in range(rows)] #Adding # of columns for each row, creating a 2D grid
         self.place_world()
         self.agent_alive = True
         self.agent_pos = (rows-1,0)
         self.arrow=True
         self.has_gold=False
         self.wumpus_alive=True
+        self.prev_position = (0,0) #just to speed up return to exit
         pass
 
     def place_random(self, item): #placing gold and obstacles into the grid
@@ -69,7 +70,7 @@ class WumpusWorld:
         while True:
             x = random.randint(0, self.rows - 1)
             y = random.randint(0, self.cols - 1)
-            if self.grid[x][y] == "EMPTY" and (x,y) != (0,0):
+            if self.grid[x][y] == EMPTY and (x,y) != (self.rows-1,0):
                 return (x,y)
 
 
@@ -101,7 +102,7 @@ class WumpusWorld:
         if (0<=r< self.rows) and (0<=c< self.cols):
             return True
         else:
-            False
+            return False
 
 
     def get_percepts(self):
@@ -116,14 +117,27 @@ class WumpusWorld:
             "stench" : False,
             "glitter" : False,
         }
+        if self.grid[x][y] == GOLD:
+                percepts["glitter"] = True
         for nx, ny in self.neighbors(): #checks through neighboring squares and changes percepts if needed
             if self.grid[nx][ny] == WUMPUS and self.wumpus_alive:
                 percepts["stench"] = True
             if self.grid[nx][ny] == PIT:
                 percepts["breeze"] = True
-            if self.grid[x][y] == GOLD:
-                percepts["glitter"] == True
         return  percepts["stench"], percepts["breeze"], percepts["glitter"]
+    
+    def move_to_exit(self):
+        x,y = self.agent_pos
+        movesTowardExit = [(x-1,y),(x,y+1)]
+        safeOptions = []
+        for _ in movesTowardExit:
+            if _ in self.getSafeNeighbors() and (_ != self.prev_position):
+                safeOptions.append(_)
+        if safeOptions:
+            return safeOptions
+        else:
+            return self.getSafeNeighbors()
+
 
 
     def move(self, action):
@@ -140,13 +154,20 @@ class WumpusWorld:
         elif action == "avoid_and_shoot":
             #avoid
             self.shoot()
-            pass
+            r,c = random.choice(self.getSafeNeighbors())
+            self.prev_position = self.agent_pos
+            self.agent_pos = (r,c)
+            
+            
         elif action == "avoid":
             #avoid
-            pass
-        elif action == "move_randomly": #avoids danger squares, just change to .neighbors instead of safe to not do this
-            print(self.getSafeNeighbors())
             r,c = random.choice(self.getSafeNeighbors())
+            self.prev_position = self.agent_pos
+            self.agent_pos = (r,c)
+            
+        elif action == "move_randomly": #avoids danger squares, just change to .neighbors instead of safe to not do this
+            r,c = random.choice(self.getSafeNeighbors())
+            self.prev_position = self.agent_pos
             self.agent_pos = (r,c)
             if self.grid[r][c]==PIT:
                 print("💀 Agent fell into a pit!")
@@ -154,22 +175,38 @@ class WumpusWorld:
             if self.grid[r][c]==WUMPUS and self.wumpus_alive:
                 print("💀 Agent eaten by the Wumpus!")
                 self.agent_alive = False
+
+        elif action == "move_to_exit":
+            moves = self.move_to_exit()
+            r,c = random.choice(moves)
+            self.prev_position = self.agent_pos
+            self.agent_pos = (r,c)
             
             
         pass
 
-    def shoot(self, target):
+    def shoot(self):
         """
         Shoot the arrow into a target cell.
         The agent only has one arrow.
         Print '☠️ Wumpus screamed!' if the Wumpus is killed.
         """
+        x,y = self.agent_pos
+        points = [(x+1,y),(x-1,y),(x,y+1),(x,y-1)]
+        targets = []
+        for nx,ny in points:
+            if self.inBounds(nx,ny):
+                targets.append((nx,ny))
         if not self.arrow:
             return 
         self.arrow=False
-        if target==self.wumpus_pos and self.wumpus_alive:
+        nx,ny = random.choice(targets)
+        if self.grid[nx][ny]== WUMPUS and self.wumpus_alive:
             self.wupus_alive=False
+            self.grid[nx][ny] = EMPTY
             print("☠️ Wumpus screamed!")
+        else:
+            print("User missed his ONE AND ONLY arrow!")
         
         
 
@@ -198,18 +235,21 @@ class SimpleReflexAgent:
         """
         percepts = world.get_percepts() 
         print(percepts)
-        action = self.get_action(percepts)
+        action = self.get_action(percepts,world)
         print(action)
         world.move(action)
         pass
 
-    def get_action(self, percepts):
+    def get_action(self, percepts, world):
+        print(percepts)
         if percepts[2]: #glitter
             return "pickup_gold"
         if percepts[0]: #stench
             return "avoid_and_shoot"
         if percepts[1]: #breeze
             return "avoid"
+        if world.has_gold:
+            return "move_to_exit"
         return "move_randomly"
 
 
