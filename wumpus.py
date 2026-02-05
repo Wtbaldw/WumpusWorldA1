@@ -1,3 +1,7 @@
+"""
+2/5/2025
+Team members: William Baldwin, 
+"""
 import pygame
 import random
 import sys
@@ -243,16 +247,16 @@ class SimpleReflexAgent:
         """
         if world.isAgent():
             percepts = world.get_percepts() 
-            print(percepts)
+            print(f"Percepts: {percepts}")
             action = self.get_action(percepts,world)
-            print(action)
+            print(f"Agent Action {action}")
             world.move(action)
+            print(f"Agent Position: {world.agent_pos}\n")
         else:
             pass
     
 
     def get_action(self, percepts, world):
-        print(percepts)
         if percepts[2]: #glitter
             return "pickup_gold"
         if percepts[0]: #stench
