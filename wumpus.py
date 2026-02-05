@@ -221,9 +221,12 @@ class WumpusWorld:
             print("✨ Gold picked up!")
 
     def isAgent(self):
-        if self.has_gold and self.agent_pos == self.grid[self.rows-1,0]:
+        if self.has_gold and self.agent_pos == (self.rows-1,0):
             self.agent_alive = False
             print("Agent has returned... WITH THE GOLD!")
+            return False
+        else:
+            return True
         
 
 
