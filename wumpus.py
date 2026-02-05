@@ -128,7 +128,7 @@ class WumpusWorld:
     
     def move_to_exit(self):
         x,y = self.agent_pos
-        movesTowardExit = [(x-1,y),(x,y+1)]
+        movesTowardExit = [(x+1,y),(x,y-1)]
         safeOptions = []
         for _ in movesTowardExit:
             if _ in self.getSafeNeighbors() and (_ != self.prev_position):
@@ -170,10 +170,11 @@ class WumpusWorld:
             self.prev_position = self.agent_pos
             self.agent_pos = (r,c)
             if self.grid[r][c]==PIT:
-                print("💀 Agent fell into a pit!")
+                print("💀 Agent fell into a pit!\nAgent is Dead")
+
                 self.agent_alive=False
             if self.grid[r][c]==WUMPUS and self.wumpus_alive:
-                print("💀 Agent eaten by the Wumpus!")
+                print("💀 Agent eaten by the Wumpus!\n Agent is Dead")
                 self.agent_alive = False
 
         elif action == "move_to_exit":
@@ -208,7 +209,6 @@ class WumpusWorld:
         else:
             print("User missed his ONE AND ONLY arrow!")
         
-        
 
     def pickup_gold(self):
         """
@@ -219,6 +219,11 @@ class WumpusWorld:
             self.has_gold=True
             self.grid[r][c]=EMPTY
             print("✨ Gold picked up!")
+
+    def isAgent(self):
+        if self.has_gold and self.agent_pos == self.grid[self.rows-1,0]:
+            self.agent_alive = False
+            print("Agent has returned... WITH THE GOLD!")
         
 
 
@@ -233,12 +238,15 @@ class SimpleReflexAgent:
         - No planning
         - No inference
         """
-        percepts = world.get_percepts() 
-        print(percepts)
-        action = self.get_action(percepts,world)
-        print(action)
-        world.move(action)
-        pass
+        if world.isAgent():
+            percepts = world.get_percepts() 
+            print(percepts)
+            action = self.get_action(percepts,world)
+            print(action)
+            world.move(action)
+        else:
+            pass
+    
 
     def get_action(self, percepts, world):
         print(percepts)
@@ -318,7 +326,6 @@ def main():
         if world.agent_alive:
             agent.act(world)
         else:
-            print("Agent died")
             pygame.quit()
             sys.exit()
 
