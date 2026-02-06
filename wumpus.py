@@ -92,13 +92,6 @@ class WumpusWorld:
         if self.inBounds(r,c-1): #up
             yield (r,c-1)
 
-    def getSafeNeighbors(self):
-        neighbors = self.neighbors()
-        safeNeighbors = []
-        for x, y in neighbors:
-            if self.grid[x][y] not in [WUMPUS,PIT]:
-                safeNeighbors.append((x, y))
-        return safeNeighbors
     
     def inBounds(self,r,c): #checks if square is inBounds
         r = r
@@ -130,21 +123,21 @@ class WumpusWorld:
                 percepts["breeze"] = True
         return  percepts["stench"], percepts["breeze"], percepts["glitter"]
     
-    def move_to_exit(self):
+    def move_to_exit(self,safeNeighbors):
         x,y = self.agent_pos
         movesTowardExit = [(x+1,y),(x,y-1)]
         safeOptions = []
         for _ in movesTowardExit:
-            if _ in self.getSafeNeighbors() and (_ != self.prev_position):
+            if _ in safeNeighbors and (_ != self.prev_position):
                 safeOptions.append(_)
         if safeOptions:
             return safeOptions
         else:
-            return self.getSafeNeighbors()
+            return safeNeighbors
 
 
 
-    def move(self, action):
+    def move(self, action, safeNeighbors):
         """
         Move the agent to a new position.
         Update agent_alive if it falls into a pit or meets the Wumpus.
@@ -158,19 +151,19 @@ class WumpusWorld:
         elif action == "avoid_and_shoot":
             #avoid
             self.shoot()
-            r,c = random.choice(self.getSafeNeighbors())
+            r,c = random.choice(safeNeighbors)
             self.prev_position = self.agent_pos
             self.agent_pos = (r,c)
             
             
         elif action == "avoid":
             #avoid
-            r,c = random.choice(self.getSafeNeighbors())
+            r,c = random.choice(safeNeighbors)
             self.prev_position = self.agent_pos
             self.agent_pos = (r,c)
             
         elif action == "move_randomly": #avoids danger squares, just change to .neighbors instead of safe to not do this
-            r,c = random.choice(self.getSafeNeighbors())
+            r,c = random.choice(safeNeighbors)
             self.prev_position = self.agent_pos
             self.agent_pos = (r,c)
             if self.grid[r][c]==PIT:
@@ -182,7 +175,7 @@ class WumpusWorld:
                 self.agent_alive = False
 
         elif action == "move_to_exit":
-            moves = self.move_to_exit()
+            moves = self.move_to_exit(safeNeighbors)
             r,c = random.choice(moves)
             self.prev_position = self.agent_pos
             self.agent_pos = (r,c)
@@ -250,12 +243,13 @@ class SimpleReflexAgent:
             print(f"Percepts: {percepts}")
             action = self.get_action(percepts,world)
             print(f"Agent Action {action}")
-            world.move(action)
+
+            safeNeighbors = self.getSafeNeighbors(world)
+            world.move(action, safeNeighbors)
             print(f"Agent Position: {world.agent_pos}\n")
         else:
             pass
     
-
     def get_action(self, percepts, world):
         if percepts[2]: #glitter
             return "pickup_gold"
@@ -266,6 +260,14 @@ class SimpleReflexAgent:
         if world.has_gold:
             return "move_to_exit"
         return "move_randomly"
+    
+    def getSafeNeighbors(self,world):
+        neighbors = world.neighbors()
+        safeNeighbors = []
+        for x, y in neighbors:
+            if world.grid[x][y] not in [WUMPUS,PIT]:
+                safeNeighbors.append((x, y))
+        return safeNeighbors
 
 
 
