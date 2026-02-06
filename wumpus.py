@@ -1,6 +1,6 @@
 """
 2/5/2025
-Team members: William Baldwin, 
+Team members: William Baldwin, Madison Montgomery, Mark Carr, Nyree Hamrick
 """
 import pygame
 import random
