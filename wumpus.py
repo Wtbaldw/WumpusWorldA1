@@ -207,7 +207,7 @@ class WumpusWorld:
         self.arrow=False
         nx,ny = random.choice(targets)
         if self.grid[nx][ny]== WUMPUS and self.wumpus_alive:
-            self.wupus_alive=False
+            self.wumpus_alive=False
             self.grid[nx][ny] = EMPTY
             print("☠️ Wumpus screamed!")
         else:
